@@ -25,6 +25,12 @@ pub trait ErrorMeta {
 #[derive(Debug, Clone, Hash, Eq, PartialEq, Ord, PartialOrd, Serialize)]
 pub struct ErrorCode(u16);
 
+impl ErrorCode {
+    pub fn as_u16(&self) -> u16 {
+        self.0
+    }
+}
+
 impl Display for ErrorCode {
     fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
         write!(f, "{}", self.0)
@@ -313,8 +319,9 @@ impl Debug for InternalError {
     }
 }
 
-#[derive(ThisError, Clone, Hash, Eq, PartialEq, Ord, PartialOrd, Serialize)]
+#[derive(ThisError, Clone, Hash, Eq, PartialEq, Ord, PartialOrd, Serialize, AsRefStr)]
 #[serde(rename_all = "camelCase")]
+#[strum(serialize_all = "PascalCase")]
 pub enum ApplicationError {
     #[error("Bad Request: {}", .message)]
     BadRequest {
@@ -600,11 +607,20 @@ impl From<InternalError> for ApplicationError {
     }
 }
 
-#[derive(ThisError, Debug, Clone, Hash, Eq, PartialEq, Ord, PartialOrd, Serialize, AsRefStr)]
+#[derive(ThisError, Debug, Clone, Hash, Eq, PartialEq, Ord, PartialOrd, Serialize)]
 #[serde(untagged)]
 pub enum IntegrationOSError {
     Internal(InternalError),
     Application(ApplicationError),
+}
+
+impl AsRef<str> for IntegrationOSError {
+    fn as_ref(&self) -> &str {
+        match self {
+            IntegrationOSError::Internal(e) => e.as_ref(),
+            IntegrationOSError::Application(e) => e.as_ref(),
+        }
+    }
 }
 
 impl From<anyhow::Error> for IntegrationOSError {
@@ -894,7 +910,8 @@ impl IntegrationOSError {
         serde_json::json!({
             "passthrough": {
                 "type": self.as_ref(),
-                "code": self.code().to_string(),
+                "code": self.code().as_u16(),
+                "status": StatusCode::from(self).as_u16(),
                 "key": self.key().to_string(),
                 "message": self.message().to_string()
             }
