@@ -7,11 +7,13 @@ use crate::prelude::StringExt;
 use http::StatusCode;
 use mongodb::error::WriteFailure;
 use serde::Serialize;
+use std::convert::AsRef;
 use std::{
     error::Error as StdError,
     fmt::{Debug, Display, Formatter, Result as FmtResult},
     sync::Arc,
 };
+use strum::AsRefStr;
 use thiserror::Error as ThisError;
 
 pub trait ErrorMeta {
@@ -59,14 +61,21 @@ impl Display for ErrorKey {
 #[derive(Debug, Clone, Hash, Eq, PartialEq, Ord, PartialOrd, Serialize)]
 pub struct ErrorMessage(String);
 
+impl AsRef<str> for ErrorMessage {
+    fn as_ref(&self) -> &str {
+        &self.0
+    }
+}
+
 impl Display for ErrorMessage {
     fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
         write!(f, "{}", self.0)
     }
 }
 
-#[derive(ThisError, Clone, Hash, Eq, PartialEq, Ord, PartialOrd, Serialize)]
+#[derive(ThisError, Clone, Hash, Eq, PartialEq, Ord, PartialOrd, Serialize, AsRefStr)]
 #[serde(rename_all = "camelCase")]
+#[strum(serialize_all = "PascalCase")]
 pub enum InternalError {
     #[error("An unknown error occurred: {}", .message)]
     UnknownError {
@@ -591,7 +600,7 @@ impl From<InternalError> for ApplicationError {
     }
 }
 
-#[derive(ThisError, Debug, Clone, Hash, Eq, PartialEq, Ord, PartialOrd, Serialize)]
+#[derive(ThisError, Debug, Clone, Hash, Eq, PartialEq, Ord, PartialOrd, Serialize, AsRefStr)]
 #[serde(untagged)]
 pub enum IntegrationOSError {
     Internal(InternalError),
@@ -883,7 +892,12 @@ impl IntegrationOSError {
     #[allow(dead_code)]
     pub(crate) fn as_json(&self) -> serde_json::Value {
         serde_json::json!({
-            "passthrough": self
+            "passthrough": {
+                "type": self.as_ref(),
+                "code": self.code().to_string(),
+                "key": self.key().to_string(),
+                "message": self.message().to_string()
+            }
         })
     }
 

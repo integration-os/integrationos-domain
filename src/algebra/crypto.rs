@@ -3,7 +3,7 @@ use crate::{
         create_secret_response::CreateSecretResponse, get_secret_request::GetSecretRequest,
         secrets_client::SecretsClient,
     },
-    IntegrationOSError, InternalError,
+    ErrorMeta, IntegrationOSError, InternalError,
 };
 use async_trait::async_trait;
 
@@ -24,7 +24,7 @@ impl CryptoExt for SecretsClient {
         secret: &GetSecretRequest,
     ) -> Result<serde_json::Value, IntegrationOSError> {
         self.get_secret(secret).await.map_err(|e| {
-            InternalError::encryption_error(&e.to_string(), Some("Failed to decrypt secret"))
+            InternalError::encryption_error(e.message().as_ref(), Some("Failed to decrypt secret"))
         })
     }
 
@@ -34,7 +34,7 @@ impl CryptoExt for SecretsClient {
         value: &serde_json::Value,
     ) -> Result<CreateSecretResponse, IntegrationOSError> {
         self.create_secret(key, value).await.map_err(|e| {
-            InternalError::encryption_error(&e.to_string(), Some("Failed to encrypt secret"))
+            InternalError::encryption_error(e.message().as_ref(), Some("Failed to encrypt secret"))
         })
     }
 }

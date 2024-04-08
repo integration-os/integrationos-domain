@@ -15,7 +15,7 @@ use crate::{
     id::{prefix::IdPrefix, Id},
     prelude::{CryptoExt, MongoStore, StoreExt, TimedExt},
     util::HashData,
-    IntegrationOSError,
+    ErrorMeta, IntegrationOSError,
 };
 use bson::doc;
 use chrono::Utc;
@@ -389,7 +389,7 @@ impl UnifiedDestination {
                 match self.get_connection_model_definition(&key).await {
                     Ok(Some(c)) => Ok(Arc::new(c)),
                     Ok(None) => Err(InternalError::key_not_found("model definition", None)),
-                    Err(e) => Err(InternalError::connection_error(&e.to_string(), None)),
+                    Err(e) => Err(InternalError::connection_error(e.message().as_ref(), None)),
                 }
             });
 
@@ -406,7 +406,7 @@ impl UnifiedDestination {
             {
                 Ok(Some(c)) => Ok(Arc::new(c)),
                 Ok(None) => Err(InternalError::key_not_found("secret", None)),
-                Err(e) => Err(InternalError::connection_error(&e.to_string(), None)),
+                Err(e) => Err(InternalError::connection_error(e.message().as_ref(), None)),
             }
         });
 
@@ -1091,7 +1091,7 @@ impl UnifiedDestination {
                     {
                         Ok(Some(c)) => Ok(Arc::new(c)),
                         Ok(None) => Err(InternalError::key_not_found("Connection", None)),
-                        Err(e) => Err(InternalError::connection_error(&e.to_string(), None)),
+                        Err(e) => Err(InternalError::connection_error(e.message().as_ref(), None)),
                     }
                 })
                 .await
@@ -1112,7 +1112,7 @@ impl UnifiedDestination {
                         "ConnectionModelDefinition",
                         None,
                     )),
-                    Err(e) => Err(InternalError::connection_error(&e.to_string(), None)),
+                    Err(e) => Err(InternalError::connection_error(e.message().as_ref(), None)),
                 }
             });
 
@@ -1129,7 +1129,7 @@ impl UnifiedDestination {
             {
                 Ok(Some(c)) => Ok(Arc::new(c)),
                 Ok(None) => Err(InternalError::key_not_found("Secrets", None)),
-                Err(e) => Err(InternalError::connection_error(&e.to_string(), None)),
+                Err(e) => Err(InternalError::connection_error(e.message().as_ref(), None)),
             }
         });
 
