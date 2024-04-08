@@ -75,7 +75,7 @@ impl Display for ErrorMessage {
 
 #[derive(ThisError, Clone, Hash, Eq, PartialEq, Ord, PartialOrd, Serialize, AsRefStr)]
 #[serde(rename_all = "camelCase")]
-#[strum(serialize_all = "camelCase")]
+#[strum(serialize_all = "PascalCase")]
 pub enum InternalError {
     #[error("An unknown error occurred: {}", .message)]
     UnknownError {
