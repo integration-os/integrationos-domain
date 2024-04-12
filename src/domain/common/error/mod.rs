@@ -133,6 +133,16 @@ pub enum InternalError {
         message: String,
         subtype: Option<String>,
     },
+    #[error("Serialization error: {}", .message)]
+    SerializeError {
+        message: String,
+        subtype: Option<String>,
+    },
+    #[error("Deserialization error: {}", .message)]
+    DeserializeError {
+        message: String,
+        subtype: Option<String>,
+    },
     #[error("An error occurred running the javascript function: {}", .message)]
     ScriptError {
         message: String,
@@ -176,6 +186,20 @@ impl InternalError {
 
     pub fn script_error(message: &str, subtype: Option<&str>) -> IntegrationOSError {
         IntegrationOSError::internal(InternalError::ScriptError {
+            message: message.to_string(),
+            subtype: subtype.map(|s| s.to_string().snake_case()),
+        })
+    }
+
+    pub fn serialize_error(message: &str, subtype: Option<&str>) -> IntegrationOSError {
+        IntegrationOSError::internal(InternalError::SerializeError {
+            message: message.to_string(),
+            subtype: subtype.map(|s| s.to_string().snake_case()),
+        })
+    }
+
+    pub fn deserialize_error(message: &str, subtype: Option<&str>) -> IntegrationOSError {
+        IntegrationOSError::internal(InternalError::DeserializeError {
             message: message.to_string(),
             subtype: subtype.map(|s| s.to_string().snake_case()),
         })
@@ -245,6 +269,8 @@ impl ErrorMeta for InternalError {
             InternalError::DecryptionError { .. } => ErrorCode(1008),
             InternalError::ConfigurationError { .. } => ErrorCode(1009),
             InternalError::ScriptError { .. } => ErrorCode(1010),
+            InternalError::SerializeError { .. } => ErrorCode(1011),
+            InternalError::DeserializeError { .. } => ErrorCode(1012),
         }
     }
 
@@ -283,6 +309,12 @@ impl ErrorMeta for InternalError {
             InternalError::ScriptError { subtype, .. } => {
                 ErrorKey::internal("script_error", subtype.as_deref())
             }
+            InternalError::SerializeError { subtype, .. } => {
+                ErrorKey::internal("serialize_error", subtype.as_deref())
+            }
+            InternalError::DeserializeError { subtype, .. } => {
+                ErrorKey::internal("deserialize_error", subtype.as_deref())
+            }
         }
     }
 
@@ -301,6 +333,8 @@ impl ErrorMeta for InternalError {
             InternalError::DecryptionError { message, .. } => ErrorMessage(message.to_string()),
             InternalError::ConfigurationError { message, .. } => ErrorMessage(message.to_string()),
             InternalError::ScriptError { message, .. } => ErrorMessage(message.to_string()),
+            InternalError::SerializeError { message, .. } => ErrorMessage(message.to_string()),
+            InternalError::DeserializeError { message, .. } => ErrorMessage(message.to_string()),
         }
     }
 }
@@ -600,7 +634,9 @@ impl From<InternalError> for ApplicationError {
             InternalError::KeyNotFound { message, subtype } => {
                 ApplicationError::NotFound { message, subtype }
             }
-            InternalError::InvalidArgument { message, subtype } => {
+            InternalError::InvalidArgument { message, subtype }
+            | InternalError::SerializeError { message, subtype }
+            | InternalError::DeserializeError { message, subtype } => {
                 ApplicationError::BadRequest { message, subtype }
             }
         }
@@ -652,7 +688,9 @@ impl<'a> From<&'a IntegrationOSError> for StatusCode {
                 InternalError::Timeout { .. } => StatusCode::GATEWAY_TIMEOUT,
                 InternalError::ConnectionError { .. } => StatusCode::BAD_GATEWAY,
                 InternalError::KeyNotFound { .. } => StatusCode::NOT_FOUND,
-                InternalError::InvalidArgument { .. } => StatusCode::BAD_REQUEST,
+                InternalError::InvalidArgument { .. }
+                | InternalError::SerializeError { .. }
+                | InternalError::DeserializeError { .. } => StatusCode::BAD_REQUEST,
                 InternalError::UnknownError { .. }
                 | InternalError::IOErr { .. }
                 | InternalError::EncryptionError { .. }
