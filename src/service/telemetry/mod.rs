@@ -20,7 +20,7 @@ where
     Sink: for<'a> MakeWriter<'a> + Send + Sync + 'static,
 {
     let formatting_layer: BunyanFormattingLayer<Sink> = BunyanFormattingLayer::new(
-        name, // Output the JSON logs to the stdout.
+        name,
         sink,
     );
 
