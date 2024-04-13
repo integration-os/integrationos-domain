@@ -1,8 +1,8 @@
 #[cfg(feature = "napi")]
 use napi_derive::napi;
-use prost::Message;
 
 use crate::{IntegrationOSError, InternalError};
+use prost::Message;
 
 #[derive(Clone, Eq, PartialEq, prost::Message)]
 #[cfg_attr(feature = "dummy", derive(fake::Dummy))]

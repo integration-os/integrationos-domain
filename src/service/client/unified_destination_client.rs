@@ -1,21 +1,18 @@
 use super::caller_client::CallerClient;
 use crate::{
-    common::{
-        api_model_config::{ModelPaths, RequestModelPaths, ResponseModelPaths},
-        connection_model_definition::{
-            ConnectionModelDefinition, CrudAction, CrudMapping, PlatformInfo,
-        },
-        connection_model_schema::ConnectionModelSchema,
-        database::DatabaseConfig,
-        destination::{Action, Destination},
-        Connection, Store,
+    api_model_config::{ModelPaths, RequestModelPaths, ResponseModelPaths},
+    connection_model_definition::{
+        ConnectionModelDefinition, CrudAction, CrudMapping, PlatformInfo,
     },
+    connection_model_schema::ConnectionModelSchema,
+    database::DatabaseConfig,
+    destination::{Action, Destination},
     error::InternalError,
     get_secret_request::GetSecretRequest,
+    hashed_secret::HashedSecret,
     id::{prefix::IdPrefix, Id},
     prelude::{CryptoExt, MongoStore, StoreExt, TimedExt},
-    util::HashData,
-    ErrorMeta, IntegrationOSError,
+    Connection, ErrorMeta, IntegrationOSError, Store,
 };
 use bson::doc;
 use chrono::Utc;
@@ -981,7 +978,12 @@ impl UnifiedDestination {
             0
         };
 
-        let hash = HashData::create_from_value(json!({
+        // let hash = HashData::create_from_value(json!({
+        //     "response": &body,
+        //     "action": config.action_name,
+        //     "commonModel": config.mapping.as_ref().map(|m| &m.common_model_name),
+        // }))?;
+        let hash = HashedSecret::try_from(json!({
             "response": &body,
             "action": config.action_name,
             "commonModel": config.mapping.as_ref().map(|m| &m.common_model_name),
@@ -1038,7 +1040,7 @@ impl UnifiedDestination {
                 "commonModel": config.mapping.as_ref().map(|m| &m.common_model_name),
                 "commonModelVersion": "v1",
                 "connectionKey": connection.key,
-                "hash": hash
+                "hash": hash.inner(),
             });
             const META: &str = "meta";
             response.insert(META.to_string(), meta);

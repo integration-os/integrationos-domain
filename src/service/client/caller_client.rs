@@ -1,5 +1,5 @@
 use crate::{
-    common::api_model_config::{ApiModelConfig, AuthMethod},
+    api_model_config::{ApiModelConfig, AuthMethod},
     prelude::oauth_secret::OAuthSecret,
     IntegrationOSError, InternalError,
 };
@@ -108,11 +108,9 @@ impl<'a> CallerClient<'a> {
 mod tests {
     use super::*;
     use crate::{
-        common::{
-            api_model_config::{SamplesInput, SchemasInput},
-            connection_model_definition::{
-                ConnectionModelDefinition, CrudAction, PlatformInfo, TestConnection,
-            },
+        api_model_config::{SamplesInput, SchemasInput},
+        connection_model_definition::{
+            ConnectionModelDefinition, CrudAction, PlatformInfo, TestConnection,
         },
         id::Id,
     };
