@@ -978,11 +978,6 @@ impl UnifiedDestination {
             0
         };
 
-        // let hash = HashData::create_from_value(json!({
-        //     "response": &body,
-        //     "action": config.action_name,
-        //     "commonModel": config.mapping.as_ref().map(|m| &m.common_model_name),
-        // }))?;
         let hash = HashedSecret::try_from(json!({
             "response": &body,
             "action": config.action_name,
