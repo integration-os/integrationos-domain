@@ -19,10 +19,7 @@ pub fn get_subscriber<Sink>(
 where
     Sink: for<'a> MakeWriter<'a> + Send + Sync + 'static,
 {
-    let formatting_layer: BunyanFormattingLayer<Sink> = BunyanFormattingLayer::new(
-        name,
-        sink,
-    );
+    let formatting_layer: BunyanFormattingLayer<Sink> = BunyanFormattingLayer::new(name, sink);
 
     let filter_layer =
         EnvFilter::try_from_default_env().unwrap_or_else(|_| EnvFilter::new(env_filter));
