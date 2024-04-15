@@ -7,6 +7,7 @@ use crate::{
 use bson::doc;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
+use std::ops::Not;
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 #[cfg_attr(feature = "dummy", derive(fake::Dummy))]
@@ -18,6 +19,8 @@ pub struct ConnectionOAuthDefinition {
     pub connection_platform: String,
     pub compute: OAuthCompute,
     pub frontend: Frontend,
+    #[serde(default, skip_serializing_if = "<&bool>::not")]
+    pub is_full_template_enabled: bool,
     #[serde(skip_serializing_if = "Option::is_none", default)]
     pub hooks: Option<Hook>,
     #[serde(flatten, default)]
