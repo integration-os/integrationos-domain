@@ -1,5 +1,6 @@
 use crate::{
-    common::{configuration::secrets::SecretsConfig, microservice::MicroService},
+    configuration::secrets::SecretsConfig,
+    microservice::MicroService,
     prelude::{
         create_secret_request::CreateSecretRequest, create_secret_response::CreateSecretResponse,
         get_secret_request::GetSecretRequest, get_secret_response::GetSecretResponse, MongoStore,

@@ -1,8 +1,6 @@
 use crate::{
-    prelude::{
-        create_secret_response::CreateSecretResponse, get_secret_request::GetSecretRequest,
-        secrets_client::SecretsClient,
-    },
+    prelude::{create_secret_response::CreateSecretResponse, get_secret_request::GetSecretRequest},
+    service::client::secrets_client::SecretsClient,
     ErrorMeta, IntegrationOSError, InternalError,
 };
 use async_trait::async_trait;
