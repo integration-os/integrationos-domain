@@ -17,8 +17,7 @@ use mongodb::options::FindOneOptions;
 use redis::{AsyncCommands, LposOptions, RedisResult};
 use std::fmt::Display;
 use std::time::Duration;
-use tracing::{debug, error, info, level_filters::LevelFilter, warn};
-use tracing_subscriber::EnvFilter;
+use tracing::{debug, error, info, warn};
 
 pub struct WatchdogClient {
     watchdog: WatchdogConfig,
@@ -53,13 +52,6 @@ impl WatchdogClient {
     }
 
     async fn run(self) -> Result<(), IntegrationOSError> {
-        let filter = EnvFilter::builder()
-            .with_default_directive(LevelFilter::DEBUG.into())
-            .from_env_lossy();
-        tracing_subscriber::fmt().with_env_filter(filter).init();
-
-        info!("Starting watchdog with config: {self}");
-
         let mut cache = RedisCache::new(&self.cache, 3).await?;
         let key = self.cache.event_throughput_key.clone();
         let mut redis_clone = cache.clone();
