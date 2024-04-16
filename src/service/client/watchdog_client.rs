@@ -17,7 +17,7 @@ use mongodb::options::FindOneOptions;
 use redis::{AsyncCommands, LposOptions, RedisResult};
 use std::fmt::Display;
 use std::time::Duration;
-use tracing::{debug, error, info, warn};
+use tracing::{error, info, warn};
 
 pub struct WatchdogClient {
     watchdog: WatchdogConfig,
@@ -54,6 +54,9 @@ impl WatchdogClient {
     async fn run(self) -> Result<(), IntegrationOSError> {
         let mut cache = RedisCache::new(&self.cache, 3).await?;
         let key = self.cache.event_throughput_key.clone();
+
+        info!("Initializing connection to cache");
+
         let mut redis_clone = cache.clone();
         tokio::spawn(async move {
             loop {
@@ -70,6 +73,9 @@ impl WatchdogClient {
                 tokio::time::sleep(Duration::from_secs(60)).await;
             }
         });
+
+        info!("Initialized connection to cache");
+        info!("Intializing connection to storage");
 
         let mongo = mongodb::Client::with_uri_str(self.database.context_db_url.clone())
             .await
@@ -95,7 +101,10 @@ impl WatchdogClient {
                 )
             })?;
 
+        info!("Initialized connection to storage");
+
         loop {
+            info!("Polling for unresponsive contexts");
             let mut count = 0;
             let timestamp =
                 Utc::now().timestamp_millis() - (self.watchdog.event_timeout * 1_000) as i64;
@@ -150,6 +159,8 @@ impl WatchdogClient {
                     continue;
                 }
             };
+
+            info!("Fetched event keys");
 
             'outer: while let Some(event_key) = event_keys.try_next().await? {
                 let Some(Bson::String(event_key)) = event_key.get("_id") else {
@@ -244,7 +255,7 @@ impl WatchdogClient {
                     }
                 }
 
-                debug!("Republishing unresponsive context {event_key}");
+                info!("Republishing unresponsive context {event_key}");
 
                 let Some(event) = event_store
                     .get_one_by_id(event_key)
@@ -291,6 +302,7 @@ impl WatchdogClient {
                 info!("Republished {count} new events");
             }
 
+            info!("Sleeping for {} seconds", self.watchdog.poll_duration);
             tokio::time::sleep(Duration::from_secs(self.watchdog.poll_duration)).await;
         }
     }
