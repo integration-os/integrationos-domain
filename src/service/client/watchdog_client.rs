@@ -9,7 +9,6 @@ use crate::{
     Event, ExtractorContext, IntegrationOSError, InternalError, PipelineContext, RootContext,
     Store,
 };
-use anyhow::Context;
 use bson::{doc, Bson, Document};
 use chrono::Utc;
 use futures::{future::join_all, TryStreamExt};
@@ -17,6 +16,7 @@ use mongodb::options::FindOneOptions;
 use redis::{AsyncCommands, LposOptions, RedisResult};
 use std::fmt::Display;
 use std::time::Duration;
+use tokio::task::JoinHandle;
 use tracing::{error, info, warn};
 
 pub struct WatchdogClient {
@@ -47,12 +47,16 @@ impl WatchdogClient {
         }
     }
 
-    pub async fn start(self) {
-        tokio::spawn(self.run());
+    pub fn start(self) -> JoinHandle<Result<(), IntegrationOSError>> {
+        tokio::spawn(self.run())
     }
 
-    async fn run(self) -> Result<(), IntegrationOSError> {
-        let mut cache = RedisCache::new(&self.cache, 3).await?;
+    pub async fn run(self) -> Result<(), IntegrationOSError> {
+        info!("Starting watchdog");
+        let mut cache = RedisCache::new(&self.cache, 3).await.map_err(|e| {
+            error!("Could not connect to cache: {e}");
+            InternalError::io_err(e.to_string().as_str(), None)
+        })?;
         let key = self.cache.event_throughput_key.clone();
 
         info!("Initializing connection to cache");
@@ -79,7 +83,10 @@ impl WatchdogClient {
 
         let mongo = mongodb::Client::with_uri_str(self.database.context_db_url.clone())
             .await
-            .with_context(|| "Could not connect to mongodb")?;
+            .map_err(|e| {
+                error!("Could not connect to mongodb: {e}");
+                InternalError::io_err(e.to_string().as_str(), None)
+            })?;
         let db = mongo.database(&self.database.context_db_name);
         let coll = db.collection::<Document>(&self.database.context_collection_name);
         let root_coll = db.collection::<RootContext>(&self.database.context_collection_name);
@@ -89,16 +96,17 @@ impl WatchdogClient {
             db.collection::<ExtractorContext>(&self.database.context_collection_name);
         let event_client = mongodb::Client::with_uri_str(self.database.event_db_url.clone())
             .await
-            .with_context(|| "Could not connect to events db")?;
+            .map_err(|e| {
+                error!("Could not connect to events db: {e}");
+                InternalError::io_err(e.to_string().as_str(), None)
+            })?;
 
         let event_db = event_client.database(&self.database.event_db_name);
         let event_store: MongoStore<Event> = MongoStore::new(&event_db, &Store::Events)
             .await
-            .with_context(|| {
-                format!(
-                    "Could not connect to event db at {}",
-                    self.database.event_db_name
-                )
+            .map_err(|e| {
+                error!("Could not connect to event db: {e}");
+                InternalError::io_err(e.to_string().as_str(), None)
             })?;
 
         info!("Initialized connection to storage");
@@ -257,10 +265,10 @@ impl WatchdogClient {
 
                 info!("Republishing unresponsive context {event_key}");
 
-                let Some(event) = event_store
-                    .get_one_by_id(event_key)
-                    .await
-                    .with_context(|| "could not fetch event for context {event_key}")?
+                let Some(event) = event_store.get_one_by_id(event_key).await.map_err(|e| {
+                    error!("Could not fetch event for context {event_key}: {e}");
+                    InternalError::io_err(e.to_string().as_str(), None)
+                })?
                 else {
                     error!("Event does not exist {event_key}");
                     continue;
