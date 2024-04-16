@@ -1,6 +1,12 @@
 use crate::IntegrationOSError;
+use actix_web::http::StatusCode;
 use actix_web::{HttpResponse, ResponseError};
-use http::StatusCode;
+
+impl<'a> From<&'a IntegrationOSError> for StatusCode {
+    fn from(error: &'a IntegrationOSError) -> Self {
+        StatusCode::from_u16(error.status()).unwrap_or(StatusCode::INTERNAL_SERVER_ERROR)
+    }
+}
 
 impl ResponseError for IntegrationOSError {
     fn status_code(&self) -> StatusCode {
