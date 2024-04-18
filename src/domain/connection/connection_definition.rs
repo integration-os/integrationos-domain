@@ -90,6 +90,7 @@ impl ConnectionDefinition {
                     category,
                     image,
                     tags,
+                    helper_link: None,
                 },
                 connection_form: ConnectionForm {
                     name,
@@ -179,6 +180,7 @@ pub struct Spec {
     pub category: String,
     pub image: String,
     pub tags: Vec<String>,
+    pub helper_link: Option<String>,
 }
 
 #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
