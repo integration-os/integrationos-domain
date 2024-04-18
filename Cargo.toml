@@ -4,6 +4,7 @@ description = "Shared library for IntegrationOS"
 license = "GPL-3.0"
 version = "3.0.0"
 edition = "2021"
+repository = "https://github.com/integration-os/integrationos-domain"
 
 [features]
 default = ["unified"]
