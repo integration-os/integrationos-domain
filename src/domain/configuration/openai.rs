@@ -5,7 +5,8 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, Envconfig)]
 pub struct OpenAiConfig {
-    #[envconfig(from = "OPENAI_API_KEY")]
+    /// The OpenAI API key
+    #[envconfig(from = "OPENAI_API_KEY", default = "")]
     pub api_key: String,
 }
 
