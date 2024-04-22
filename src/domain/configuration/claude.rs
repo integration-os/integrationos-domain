@@ -11,7 +11,8 @@ pub struct ClaudeConfig {
     pub url: String,
     #[envconfig(from = "CLAUDE_ANTHROPIC_VERSION", default = "2023-06-01")]
     pub anthropic_version: String,
-    #[envconfig(from = "CLAUDE_API_KEY")]
+    /// The Claude API key
+    #[envconfig(from = "CLAUDE_API_KEY", default = "")]
     pub api_key: String,
     #[envconfig(from = "CLAUDE_MODEL", default = "claude-2.0")]
     pub model: String,
