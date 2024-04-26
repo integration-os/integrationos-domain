@@ -37,14 +37,17 @@ pub struct Connection {
     pub name: String,
     #[serde(default = "key_default")]
     pub key: Arc<str>,
+    #[serde(skip_serializing)]
     pub group: String,
     pub environment: Environment,
     pub platform: Arc<str>,
     pub secrets_service_id: String,
     pub event_access_id: Id,
+    #[serde(skip_serializing)]
     pub access_key: String,
     pub settings: Settings,
     pub throughput: Throughput,
+    #[serde(skip_serializing)]
     pub ownership: Ownership,
     #[serde(default)]
     pub oauth: Option<OAuth>,
