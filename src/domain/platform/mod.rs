@@ -1,3 +1,6 @@
+pub mod page;
+pub mod r#type;
+
 use crate::{
     id::{prefix::IdPrefix, Id},
     {
