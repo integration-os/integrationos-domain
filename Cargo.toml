@@ -2,7 +2,7 @@
 name = "integrationos-domain"
 description = "Shared library for IntegrationOS"
 license = "GPL-3.0"
-version = "3.0.3"
+version = "3.0.4"
 edition = "2021"
 
 [features]
