@@ -43,7 +43,6 @@ pub struct EventTokenResponse {
 pub struct Feature {
     pub key: String,
     pub value: FeatureState,
-    pub updated_at: i64,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
