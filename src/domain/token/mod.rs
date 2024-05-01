@@ -1,5 +1,6 @@
 use crate::{
-    connection_oauth_definition::ConnectedPlatform, environment::Environment, ownership::Ownership, record_metadata::RecordMetadata, Connection, Id
+    connection_oauth_definition::ConnectedPlatform, environment::Environment, ownership::Ownership,
+    record_metadata::RecordMetadata, Connection, Id,
 };
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
