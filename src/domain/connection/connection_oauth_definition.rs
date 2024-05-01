@@ -116,16 +116,16 @@ impl Settings {
 pub struct ConnectedPlatform {
     #[serde(rename = "type")]
     pub r#type: String,
-    #[serde(default)]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub scopes: Option<String>,
-    #[serde(default)]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub title: Option<String>,
     pub connection_definition_id: Id,
     #[serde(default)]
     pub active: Option<bool>,
     pub image: Option<String>,
     pub secrets_service_id: Option<String>,
-    #[serde(default)]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub secret: Option<ConnectedPlatformSecret>,
 }
 
