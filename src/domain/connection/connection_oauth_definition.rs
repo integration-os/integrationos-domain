@@ -126,8 +126,6 @@ pub struct ConnectedPlatform {
     pub image: Option<String>,
     pub secrets_service_id: Option<String>,
     #[serde(default)]
-    pub activated_at: Option<i64>,
-    #[serde(default)]
     pub secret: Option<ConnectedPlatformSecret>,
 }
 
