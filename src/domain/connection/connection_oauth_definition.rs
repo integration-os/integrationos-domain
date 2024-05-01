@@ -2,7 +2,7 @@ use super::api_model_config::{ApiModelConfig, Function};
 use crate::{
     id::Id,
     prelude::{ownership::Ownership, shared::record_metadata::RecordMetadata},
-    Hook,
+    Feature, Hook,
 };
 use bson::doc;
 use serde::{Deserialize, Serialize};
@@ -98,6 +98,8 @@ pub struct Settings {
     pub ownership: Ownership,
     #[serde(default)]
     pub connected_platforms: Vec<ConnectedPlatform>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub features: Vec<Feature>,
 }
 
 impl Settings {
@@ -112,10 +114,28 @@ impl Settings {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ConnectedPlatform {
-    pub connection_definition_id: Id,
     #[serde(rename = "type")]
     pub r#type: String,
+    #[serde(default)]
+    pub scopes: Option<String>,
+    #[serde(default)]
+    pub title: Option<String>,
+    pub connection_definition_id: Id,
+    #[serde(default)]
+    pub active: Option<bool>,
+    pub image: Option<String>,
     pub secrets_service_id: Option<String>,
+    #[serde(default)]
+    pub activated_at: Option<i64>,
+    #[serde(default)]
+    pub secret: Option<ConnectedPlatformSecret>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ConnectedPlatformSecret {
+    client_id: String,
+    client_secret_display: String,
 }
 
 #[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
