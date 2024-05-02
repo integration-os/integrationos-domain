@@ -15,6 +15,7 @@ pub mod schema;
 pub mod secret;
 pub mod shared;
 pub mod store;
+pub mod token;
 
 pub use access_key::*;
 pub use configuration::*;
@@ -33,3 +34,4 @@ pub use schema::*;
 pub use secret::*;
 pub use shared::*;
 pub use store::*;
+pub use token::*;
