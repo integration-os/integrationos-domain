@@ -247,7 +247,6 @@ impl UnifiedDestination {
                     .iter()
                     .map(|c| match c.platform_info {
                         PlatformInfo::Api(ref c) => c.path.as_ref(),
-                        _ => "",
                     });
 
                 let matched_route = match_route(path, routes).map(|r| r.to_string());
@@ -258,7 +257,6 @@ impl UnifiedDestination {
                         PlatformInfo::Api(ref c) => matched_route
                             .as_ref()
                             .map_or(false, |mr| c.path.as_str() == mr),
-                        _ => false,
                     });
 
                 if let Some(mut connection_model_definition) = connection_model_definitions.next() {
@@ -276,7 +274,6 @@ impl UnifiedDestination {
                             c.path = template;
                             connection_model_definition.platform_info = PlatformInfo::Api(c);
                         }
-                        PlatformInfo::Db(_) => {}
                     }
 
                     Ok(Some(connection_model_definition))
@@ -358,9 +355,6 @@ impl UnifiedDestination {
                     .await?;
 
                 Ok(response)
-            }
-            PlatformInfo::Db(ref _c) => {
-                todo!()
             }
         }
     }
@@ -635,12 +629,7 @@ impl UnifiedDestination {
             }
         }
 
-        let PlatformInfo::Api(api_config) = &config.platform_info else {
-            return Err(InternalError::invalid_argument(
-                "Sent a db config through unified send to destination",
-                None,
-            ));
-        };
+        let PlatformInfo::Api(api_config) = &config.platform_info;
 
         if let Some(ModelPaths {
             request: Some(RequestModelPaths { object: Some(path) }),

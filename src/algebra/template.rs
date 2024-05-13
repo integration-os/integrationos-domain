@@ -6,11 +6,7 @@ use serde_json::Value;
 pub trait TemplateExt {
     fn render(&self, template: &str, data: Option<&Value>) -> Result<String, IntegrationOSError>;
 
-    fn render_as<T: serde::Serialize>(
-        &self,
-        template: &T,
-        data: Option<&Value>,
-    ) -> Result<T, IntegrationOSError>
+    fn render_as<T>(&self, template: &T, data: Option<&Value>) -> Result<T, IntegrationOSError>
     where
         T: DeserializeOwned + Serialize;
 }

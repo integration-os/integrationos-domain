@@ -121,15 +121,11 @@ impl ConnectionDefinition {
         }
     }
 
+    #[deprecated(since = "3.2.0", note = "Use `ConnectionType` instead")]
     pub fn to_connection_type(&self) -> super::ConnectionType {
         match self.r#type {
-            ConnectionDefinitionType::Api => ConnectionType::Api {
-                model_configs: vec![],
-                oauth_configs: vec![],
-            },
-            ConnectionDefinitionType::DatabaseSql => ConnectionType::DatabaseSql {
-                model_configs: vec![],
-            },
+            ConnectionDefinitionType::Api => ConnectionType::Api,
+            ConnectionDefinitionType::DatabaseSql => ConnectionType::DatabaseSql,
             ConnectionDefinitionType::DatabaseNoSql => ConnectionType::DatabaseNoSql,
             ConnectionDefinitionType::FileSystem => ConnectionType::FileSystem,
             ConnectionDefinitionType::Stream => ConnectionType::Stream,
