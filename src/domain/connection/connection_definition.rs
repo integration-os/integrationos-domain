@@ -121,7 +121,7 @@ impl ConnectionDefinition {
         }
     }
 
-    #[deprecated(since = "3.2.0", note = "Use `ConnectionType` instead")]
+    #[deprecated(since = "4.0.0", note = "Use `ConnectionType` instead")]
     pub fn to_connection_type(&self) -> super::ConnectionType {
         match self.r#type {
             ConnectionDefinitionType::Api => ConnectionType::Api,
