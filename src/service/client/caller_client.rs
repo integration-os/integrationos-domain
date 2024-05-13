@@ -92,14 +92,13 @@ impl<'a> CallerClient<'a> {
             AuthMethod::None => request_builder,
         };
 
-        debug!("Sending request: {request_builder:#?}");
-
         let res = request_builder.send().await.map_err(|e| {
             InternalError::io_err(
                 &format!("Failed to send request: {}", e),
                 Some("reqwest::Error"),
             )
         })?;
+
         Ok(res)
     }
 }

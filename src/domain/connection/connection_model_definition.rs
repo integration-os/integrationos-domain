@@ -1,4 +1,4 @@
-use super::{api_model_config::ApiModelConfig, db_model_config::DbModelConfig};
+use super::api_model_config::ApiModelConfig;
 use crate::{
     id::Id,
     prelude::{schema::common_model::CommonModel, shared::record_metadata::RecordMetadata},
@@ -95,7 +95,6 @@ pub enum ConnectionModelDefinitionWithState {
 #[serde(untagged)]
 pub enum PlatformInfo {
     Api(ApiModelConfig),
-    Db(DbModelConfig),
 }
 
 #[derive(Debug, Clone, Eq, PartialEq, Hash, Deserialize, Serialize)]
@@ -425,9 +424,7 @@ mod tests {
         assert_eq!(model_config.name, "webhook_endpoints");
         assert_eq!(model_config.action, http::Method::GET);
         assert_eq!(model_config.action_name, CrudAction::GetOne);
-        let PlatformInfo::Api(platform_info) = model_config.platform_info else {
-            panic!("Incorrect platform info");
-        };
+        let PlatformInfo::Api(platform_info) = model_config.platform_info;
         assert_eq!(platform_info.base_url, "https://api.stripe.com/v1");
         assert_eq!(platform_info.path, "webhook_endpoints");
         assert_eq!(

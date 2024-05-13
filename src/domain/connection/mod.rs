@@ -3,23 +3,16 @@ pub mod connection_definition;
 pub mod connection_model_definition;
 pub mod connection_model_schema;
 pub mod connection_oauth_definition;
-pub mod db_model_config;
-
-use crate::id::Id;
-use serde::{Deserialize, Serialize};
-use serde_json::Value;
-use std::{hash::Hash, sync::Arc};
-use strum::{AsRefStr, Display, EnumString};
-
-use self::{
-    connection_model_definition::ConnectionModelDefinition,
-    connection_oauth_definition::ConnectionOAuthDefinition, db_model_config::DbModelConfig,
-};
 
 use super::{
     configuration::environment::Environment,
     shared::{ownership::Ownership, record_metadata::RecordMetadata, settings::Settings},
 };
+use crate::id::Id;
+use serde::{Deserialize, Serialize};
+use serde_json::Value;
+use std::{hash::Hash, sync::Arc};
+use strum::{AsRefStr, Display, EnumString};
 
 fn key_default() -> Arc<str> {
     String::new().into()
@@ -113,18 +106,8 @@ pub enum OAuth {
 #[serde(rename_all = "lowercase")]
 #[strum(serialize_all = "lowercase")]
 pub enum ConnectionType {
-    //TODO: Remove
-    Api {
-        #[serde(rename = "apiModelConfigs")]
-        model_configs: Vec<ConnectionModelDefinition>,
-        #[serde(default)]
-        oauth_configs: Vec<ConnectionOAuthDefinition>,
-    },
-    //TODO: Remove
-    DatabaseSql {
-        #[serde(rename = "dbModelConfigs")]
-        model_configs: Vec<DbModelConfig>,
-    },
+    Api,
+    DatabaseSql,
     DatabaseNoSql,
     FileSystem,
     Stream,
