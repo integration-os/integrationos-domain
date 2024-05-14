@@ -17,17 +17,6 @@ The following environment variables are introduced, not necessarily used, by thi
 - `REDIS_EVENT_THROUGHPUT_KEY`: The key to be used to store the event throughput in the Redis server. Default is `event_throughput`.
 - `REDIS_API_THROUGHPUT_KEY`: The key to be used to store the API throughput in the Redis server. Default is `api_throughput`.
 
-- `CLAUDE_URL`: The URL to connect to the Claude server. Default is `https://api.anthropic.com/v1/complete`.
-- `CLAUDE_ANTHROPIC_VERSION`: The version of the Claude server. Default is `2023-06-01`.
-- `CLAUDE_API_KEY`: The API key to connect to the Claude server.
-- `CLAUDE_MODEL`: The model to be used in the Claude server. Default is `claude-2.0`.
-- `CLAUDE_MAX_TOKENS_TO_SAMPLE`: The maximum number of tokens to sample in the Claude server. Default is `10000`.
-- `CLAUDE_STOP_SEQUENCES`: The stop sequences to be used in the Claude server. Default is an empty string.
-- `CLAUDE_TEMPERATURE`: The temperature to be used in the Claude server. Default is `0.1`.
-- `CLAUDE_TOP_P`: The top-p to be used in the Claude server. Default is `0.7`.
-- `CLAUDE_TOP_K`: The top-k to be used in the Claude server. Default is `5`.
-- `CLAUDE_USER_ID`: The user ID to be used in the Claude server. Default is `internal-system`.
-
 - `CONTROL_DATABASE_URL`: The URL to connect to the control database. Default is `mongodb://localhost:27017`.
 - `CONTROL_DATABASE_NAME`: The name of the control database. Default is `database`.
 - `UDM_DATABASE_URL`: The URL to connect to the UDM database. Default is `mongodb://localhost:27017`.

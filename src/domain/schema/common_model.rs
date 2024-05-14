@@ -1,7 +1,7 @@
 use crate::{
     api_model_config::Lang,
     id::{prefix::IdPrefix, Id},
-    prelude::{shared::record_metadata::RecordMetadata, MongoStore, StoreExt, StringExt},
+    prelude::{shared::record_metadata::RecordMetadata, MongoStore, StringExt},
     IntegrationOSError, InternalError,
 };
 use async_recursion::async_recursion;

@@ -1,10 +1,8 @@
 use crate::id::Id;
-use async_trait::async_trait;
 use downcast_rs::{impl_downcast, Downcast};
 use serde::{Deserialize, Serialize};
 use std::fmt::{Debug, Display};
 
-#[async_trait]
 pub trait PipelineExt: Downcast + Sync + Send + Debug {
     fn is_complete(&self) -> bool;
     fn context_key(&self) -> &Id;
