@@ -3,7 +3,7 @@ use crate::{
     database::DatabaseConfig,
     event_with_context::EventWithContext,
     pipeline_context::PipelineStage,
-    prelude::{MongoStore, RedisCache, StoreExt},
+    prelude::{MongoStore, RedisCache},
     root_context::RootStage,
     watchdog::WatchdogConfig,
     Event, ExtractorContext, IntegrationOSError, InternalError, PipelineContext, RootContext,

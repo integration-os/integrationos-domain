@@ -11,7 +11,7 @@ use crate::{
     get_secret_request::GetSecretRequest,
     hashed_secret::HashedSecret,
     id::{prefix::IdPrefix, Id},
-    prelude::{CryptoExt, MongoStore, StoreExt, TimedExt},
+    prelude::{CryptoExt, MongoStore, TimedExt},
     Connection, ErrorMeta, IntegrationOSError, Store,
 };
 use bson::doc;

@@ -7,7 +7,6 @@ use http::HeaderMap;
 use reqwest::{Client, Response};
 use serde_json::Value;
 use std::collections::HashMap;
-use tracing::debug;
 
 #[derive(Debug, Clone)]
 pub struct CallerClient<'a> {
