@@ -91,6 +91,16 @@ impl<T: Serialize + DeserializeOwned + Unpin + Sync + Send + 'static> MongoStore
         Ok(())
     }
 
+    pub async fn update_many(
+        &self,
+        filter: Document,
+        data: Document,
+    ) -> Result<(), IntegrationOSError> {
+        self.collection.update_many(filter, data, None).await?;
+
+        Ok(())
+    }
+
     pub async fn update_many_with_aggregation_pipeline(
         &self,
         filter: Document,

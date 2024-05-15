@@ -106,8 +106,8 @@ pub enum OAuth {
 #[serde(rename_all = "lowercase")]
 #[strum(serialize_all = "lowercase")]
 pub enum ConnectionType {
-    Api,
-    DatabaseSql,
+    Api {},
+    DatabaseSql {},
     DatabaseNoSql,
     FileSystem,
     Stream,
