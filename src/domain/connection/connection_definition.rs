@@ -124,8 +124,8 @@ impl ConnectionDefinition {
     #[deprecated(since = "4.0.0", note = "Use `ConnectionType` instead")]
     pub fn to_connection_type(&self) -> super::ConnectionType {
         match self.r#type {
-            ConnectionDefinitionType::Api => ConnectionType::Api,
-            ConnectionDefinitionType::DatabaseSql => ConnectionType::DatabaseSql,
+            ConnectionDefinitionType::Api => ConnectionType::Api {},
+            ConnectionDefinitionType::DatabaseSql => ConnectionType::DatabaseSql {},
             ConnectionDefinitionType::DatabaseNoSql => ConnectionType::DatabaseNoSql,
             ConnectionDefinitionType::FileSystem => ConnectionType::FileSystem,
             ConnectionDefinitionType::Stream => ConnectionType::Stream,
