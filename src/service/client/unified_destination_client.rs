@@ -263,21 +263,12 @@ impl UnifiedDestination {
                             .map_or(false, |mr| c.path.as_str() == mr),
                     });
 
-                if let Some(mut connection_model_definition) = connection_model_definitions.next() {
+                if let Some(connection_model_definition) = connection_model_definitions.next() {
                     if connection_model_definitions.next().is_some() {
                         return Err(InternalError::invalid_argument(
                             "Multiple connection model definitions found for this path",
                             None,
                         ));
-                    }
-
-                    match connection_model_definition.platform_info {
-                        PlatformInfo::Api(ref c) => {
-                            let template = template_route(c.path.clone(), path.to_string());
-                            let mut c = c.clone();
-                            c.path = template;
-                            connection_model_definition.platform_info = PlatformInfo::Api(c);
-                        }
                     }
 
                     Ok(Some(connection_model_definition))
@@ -1127,7 +1118,19 @@ impl UnifiedDestination {
         let config = join_result.0?;
         let secret = join_result.1?;
 
-        self.execute_model_definition(&config, headers, &query_params, &secret, context)
+        // Template the route for passthrough actions
+        let templated_config = match &destination.action {
+            Action::Passthrough { method: _, path } => {
+                let mut config_clone = (*config).clone();
+                let PlatformInfo::Api(ref mut c) = config_clone.platform_info;
+                let template = template_route(c.path.clone(), path.to_string());
+                c.path = template;
+                Arc::new(config_clone)
+            }
+            _ => config.clone(),
+        };
+
+        self.execute_model_definition(&templated_config, headers, &query_params, &secret, context)
             .await
     }
 }
