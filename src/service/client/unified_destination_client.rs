@@ -116,7 +116,11 @@ fn match_route<'a>(full_path: &'a str, routes: impl Iterator<Item = &'a str>) ->
         if route_segments
             .iter()
             .zip(&segments)
-            .all(|(route_seg, path_seg)| route_seg == path_seg || route_seg.starts_with(':'))
+            .all(|(route_seg, path_seg)| {
+                route_seg == path_seg
+                    || route_seg.starts_with(':')
+                    || (route_seg.starts_with("{{") && route_seg.ends_with("}}"))
+            })
         {
             return Some(route);
         }
@@ -1137,7 +1141,7 @@ mod tests {
         let routes = [
             "/customers",
             "/customers/:id",
-            "/customers/:id/orders",
+            "/customers/{{id}}/orders",
             "/customers/:id/orders/:order_id",
         ]
         .into_iter();
@@ -1152,7 +1156,7 @@ mod tests {
         );
         assert_eq!(
             match_route("/customers/123/orders", routes.clone()),
-            Some("/customers/:id/orders")
+            Some("/customers/{{id}}/orders")
         );
         assert_eq!(
             match_route("/customers/123/orders/456", routes.clone()),
