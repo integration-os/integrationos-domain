@@ -1084,39 +1084,34 @@ impl UnifiedDestination {
                 })?
         };
 
-        let config_fut = self
-            .connection_model_definitions_destination_cache
-            .try_get_with_by_ref(destination, async {
-                match self.get_connection_model_definition(destination).await {
+        let config = match self.get_connection_model_definition(destination).await {
+            Ok(Some(c)) => Ok(Arc::new(c)),
+            Ok(None) => Err(InternalError::key_not_found(
+                "ConnectionModelDefinition",
+                None,
+            )),
+            Err(e) => Err(InternalError::connection_error(e.message().as_ref(), None)),
+        }?;
+
+        let secret = self
+            .secrets_cache
+            .try_get_with_by_ref(&connection, async {
+                let secret_request = GetSecretRequest {
+                    buildable_id: connection.ownership.id.to_string(),
+                    id: connection.secrets_service_id.clone(),
+                };
+                match self
+                    .secrets_client
+                    .decrypt(&secret_request)
+                    .map(|v| Some(v).transpose())
+                    .await
+                {
                     Ok(Some(c)) => Ok(Arc::new(c)),
-                    Ok(None) => Err(InternalError::key_not_found(
-                        "ConnectionModelDefinition",
-                        None,
-                    )),
+                    Ok(None) => Err(InternalError::key_not_found("Secrets", None)),
                     Err(e) => Err(InternalError::connection_error(e.message().as_ref(), None)),
                 }
-            });
-
-        let secret_fut = self.secrets_cache.try_get_with_by_ref(&connection, async {
-            let secret_request = GetSecretRequest {
-                buildable_id: connection.ownership.id.to_string(),
-                id: connection.secrets_service_id.clone(),
-            };
-            match self
-                .secrets_client
-                .decrypt(&secret_request)
-                .map(|v| Some(v).transpose())
-                .await
-            {
-                Ok(Some(c)) => Ok(Arc::new(c)),
-                Ok(None) => Err(InternalError::key_not_found("Secrets", None)),
-                Err(e) => Err(InternalError::connection_error(e.message().as_ref(), None)),
-            }
-        });
-
-        let join_result = join!(config_fut, secret_fut);
-        let config = join_result.0?;
-        let secret = join_result.1?;
+            })
+            .await?;
 
         // Template the route for passthrough actions
         let templated_config = match &destination.action {
