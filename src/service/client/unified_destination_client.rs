@@ -143,7 +143,7 @@ fn template_route(model_definition_path: String, full_request_path: String) -> S
     let mut template = String::new();
 
     for (i, segment) in model_definition_segments.iter().enumerate() {
-        if segment.starts_with(':') {
+        if segment.starts_with(':') || (segment.starts_with("{{") && segment.ends_with("}}")) {
             template.push_str(full_request_segments[i]);
         } else {
             template.push_str(segment);
@@ -1171,6 +1171,14 @@ mod tests {
         assert_eq!(
             template_route(
                 "/customers/:id/orders/:order_id".to_string(),
+                "/customers/123/orders/456".to_string()
+            ),
+            "customers/123/orders/456".to_string()
+        );
+
+        assert_eq!(
+            template_route(
+                "/customers/{{id}}/orders/{{order_id}}".to_string(),
                 "/customers/123/orders/456".to_string()
             ),
             "customers/123/orders/456".to_string()
