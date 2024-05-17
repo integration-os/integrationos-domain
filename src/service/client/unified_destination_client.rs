@@ -1125,6 +1125,7 @@ impl UnifiedDestination {
                 let PlatformInfo::Api(ref mut c) = config_clone.platform_info;
                 let template = template_route(c.path.clone(), path.to_string());
                 c.path = template;
+                config_clone.platform_info = PlatformInfo::Api(c.clone());
                 Arc::new(config_clone)
             }
             _ => config.clone(),
