@@ -1,4 +1,9 @@
-# IntegrationOS Domain
+# Repository Takedown Notice
+**⚠️ This repository now is part of the [integration-os](https://github.com/integration-os/integration-os) repository and is no longer published to Cargo.**
+
+---
+
+## IntegrationOS Domain
 
 This documentation does not aim to be an in-depth explanation of the code, but rather a high-level overview of the project.
 For a more detailed explanation, please refer to the code itself.
